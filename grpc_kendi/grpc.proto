@@ -1,0 +1,67 @@
+
+syntax = "proto3";
+
+package greet;
+
+service Yusuf{
+    rpc toplama(istek_sayi) returns (cevap_toplam) {}
+    rpc selamla(istek_isim) returns (cevap_selamlama) {}
+}
+
+message istek_sayi{
+    int32 birinci = 1;
+    int32 ikinci = 2;
+}
+
+message cevap_toplam{
+    int32 toplam = 1;
+}
+
+message istek_isim{
+    string isim = 1;
+}
+
+message cevap_selamlama{
+    string mesaj=1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

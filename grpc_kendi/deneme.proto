@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package greet;
+
+service servis{
+    rpc bolme(istek_sayilar) returns (cevap_bolme) {}
+    rpc selamla(istek_isim) returns (cevap_selamla) {}
+}
+
+message istek_sayilar{
+    int32 sayi_1 = 1;
+    int32 sayi_2 =2;
+}
+
+message istek_isim{
+    string isim = 1;
+}
+
+message cevap_bolme{
+    int32 bolum =1;
+    int32 kalan=2;
+}
+
+message cevap_selamla{
+    string mesaj = 1;
+}

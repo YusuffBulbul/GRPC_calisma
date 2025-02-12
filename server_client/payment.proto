@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+service PaymentService {
+    rpc ProcessPayment (PaymentRequest) returns (PaymentResponse);
+}
+
+message PaymentRequest {
+    float amount = 1;
+}
+
+message PaymentResponse {
+    bool success = 1;
+}
