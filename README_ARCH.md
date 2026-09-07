@@ -1,117 +1,53 @@
 # System Blueprint: YusuffBulbul/GRPC_calisma
 
-> Architecture analysis
+> Architecture and code review analysis
 >
 > Auto-generated on 2026-09-07 by Repo-to-Blueprint Architect
 
 # English Version
 
 ## Project Purpose
-- Repository contains multiple Python gRPC example implementations: protobuf definitions (.proto), generated Python bindings (_pb2.py and _pb2_grpc.py), and example client/server scripts. Evidence: presence of proto files (e.g., grpc_quickstart/protos/helloworld.proto) and multiple server/client scripts (e.g., grpc_quickstart/greeter_server.py, grpc_quickstart/greeter_client.py, python_grpc/greet_server.py, python_grpc/greet_client.py).
+This repository contains multiple Python gRPC example implementations: server and client scripts plus .proto definitions and generated protobuf/grpc Python modules (examples include python_grpc/greet_server.py, grpc_quickstart/greeter_server.py, server_client/OrderService.py and matching .proto files such as python_grpc/protos/greet.proto and server_client/order.proto).
 
 ## Technical Stack
-- **Language**: Python (files with .py present across repository; e.g., grpc_quickstart/greeter_server.py).
-- **Framework**: Not specified in dependency files (no requirements.txt, pyproject.toml, or similar present in the repository root).
-- **Key Dependencies**: None listed in repository dependency files (no requirements.txt, package.json, pyproject.toml, or go.mod present).
+- **Language**: Python (files with .py)
+- **Framework**: None specified (no dependency manifest like requirements.txt, pyproject.toml, or setup.py present)
+- **Key Dependencies**: None specified (no dependency file found in the repository)
+- **Infrastructure**:
 
 ## Architecture Blueprint
 
 ```mermaid
 flowchart TD
-  subgraph Clients
-    C1["grpc_quickstart/greeter_client.py"]
-    C2["python_grpc/greet_client.py"]
-    C3["grpc_kendi/deneme_client.py"]
-    C4["grpc_kendi/last_client.py"]
-    C5["grpc_kendi/grpc_devam/client.py"]
+  subgraph Examples_KENDI
+    KendiClient["deneme_client.py / last_client.py / yusuf_client.py"]["Service"]
+    KendiServer["deneme_server.py / last_server.py / yusuf_server.py"]["Service"]
   end
+  subgraph Examples_QUICKSTART
+    QuickClient["greeter_client.py"]["Service"]
+    QuickServer["greeter_server.py"]["Service"]
   end
-
-  subgraph Servers
-    S1["grpc_quickstart/greeter_server.py"]
-    S2["python_grpc/greet_server.py"]
-    S3["grpc_kendi/deneme_server.py"]
-    S4["grpc_kendi/last_server.py"]
-    S5["grpc_kendi/yusuf_server.py"]
-    S6["grpc_kendi/grpc_devam/server.py"]
-    S7["server_client/OrderService.py"]
-    S8["server_client/PaymentService.py"]
+  subgraph Examples_PYTHON_GRPC
+    GreetClient["greet_client.py"]["Service"]
+    GreetServer["greet_server.py"]["Service"]
   end
+  subgraph Examples_SERVER_CLIENT
+    OrderService["OrderService.py"]["Service"]
+    PaymentService["PaymentService.py"]["Service"]
   end
+  KendiClient --> KendiServer
+  QuickClient --> QuickServer
+  GreetClient --> GreetServer
+  OrderService --> PaymentService
 
-  subgraph Generated
-    G1["grpc_quickstart/helloworld_pb2.py"]
-    G2["grpc_quickstart/helloworld_pb2_grpc.py"]
-    G3["python_grpc/greet_pb2.py"]
-    G4["python_grpc/greet_pb2_grpc.py"]
-    G5["grpc_kendi/deneme_pb2.py"]
-    G6["grpc_kendi/deneme_pb2_grpc.py"]
-    G7["server_client/order_pb2.py"]
-    G8["server_client/payment_pb2.py"]
-  end
-  end
-
-  subgraph Protos
-    P1["grpc_quickstart/protos/helloworld.proto"]
-    P2["python_grpc/protos/greet.proto"]
-    P3["grpc_kendi/deneme.proto"]
-    P4["server_client/order.proto"]
-    P5["server_client/payment.proto"]
-    P6["grpc_kendi/grpc_devam/first.proto"]
-    P7["grpc_kendi/last_dance.proto"]
-    P8["grpc_kendi/grpc.proto"]
-  end
-  end
-
-  C1 -->|"calls stub" G2
-  C2 -->|"calls stub" G4
-  C3 -->|"calls stub" G5
-  C4 -->|"calls stub" G6
-  S1 -->|"imports" G1
-  S1 -->|"imports" G2
-  S2 -->|"imports" G3
-  S2 -->|"imports" G4
-  S3 -->|"imports" G5
-  S3 -->|"imports" G6
-  G1 -->|"generated from" P1
-  G2 -->|"generated from" P1
-  G3 -->|"generated from" P2
-  G4 -->|"generated from" P2
-  G5 -->|"generated from" P3
-  G6 -->|"generated from" P3
-
-  style C1 fill:#1f6feb,stroke:#58a6ff,color:#fff
-  style C2 fill:#1f6feb,stroke:#58a6ff,color:#fff
-  style C3 fill:#1f6feb,stroke:#58a6ff,color:#fff
-  style C4 fill:#1f6feb,stroke:#58a6ff,color:#fff
-  style C5 fill:#1f6feb,stroke:#58a6ff,color:#fff
-
-  style S1 fill:#238636,stroke:#3fb950,color:#fff
-  style S2 fill:#238636,stroke:#3fb950,color:#fff
-  style S3 fill:#238636,stroke:#3fb950,color:#fff
-  style S4 fill:#238636,stroke:#3fb950,color:#fff
-  style S5 fill:#238636,stroke:#3fb950,color:#fff
-  style S6 fill:#238636,stroke:#3fb950,color:#fff
-  style S7 fill:#238636,stroke:#3fb950,color:#fff
-  style S8 fill:#238636,stroke:#3fb950,color:#fff
-
-  style G1 fill:#da3633,stroke:#f85149,color:#fff
-  style G2 fill:#da3633,stroke:#f85149,color:#fff
-  style G3 fill:#da3633,stroke:#f85149,color:#fff
-  style G4 fill:#da3633,stroke:#f85149,color:#fff
-  style G5 fill:#da3633,stroke:#f85149,color:#fff
-  style G6 fill:#da3633,stroke:#f85149,color:#fff
-  style G7 fill:#da3633,stroke:#f85149,color:#fff
-  style G8 fill:#da3633,stroke:#f85149,color:#fff
-
-  style P1 fill:#8b949e,stroke:#c9d1d9,color:#fff
-  style P2 fill:#8b949e,stroke:#c9d1d9,color:#fff
-  style P3 fill:#8b949e,stroke:#c9d1d9,color:#fff
-  style P4 fill:#8b949e,stroke:#c9d1d9,color:#fff
-  style P5 fill:#8b949e,stroke:#c9d1d9,color:#fff
-  style P6 fill:#8b949e,stroke:#c9d1d9,color:#fff
-  style P7 fill:#8b949e,stroke:#c9d1d9,color:#fff
-  style P8 fill:#8b949e,stroke:#c9d1d9,color:#fff
+  style KendiClient fill:#1f6feb,stroke:#58a6ff,color:#fff
+  style QuickClient fill:#1f6feb,stroke:#58a6ff,color:#fff
+  style GreetClient fill:#1f6feb,stroke:#58a6ff,color:#fff
+  style KendiServer fill:#238636,stroke:#3fb950,color:#fff
+  style QuickServer fill:#238636,stroke:#3fb950,color:#fff
+  style GreetServer fill:#238636,stroke:#3fb950,color:#fff
+  style OrderService fill:#238636,stroke:#3fb950,color:#fff
+  style PaymentService fill:#238636,stroke:#3fb950,color:#fff
 
 ```
 
@@ -119,24 +55,46 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-  participant GreeterClient
-  participant GreeterStub
-  participant GreeterServer
-  participant HelloworldPB2
+  participant GreetClient as "python_grpc/greet_client.py"
+  participant GreetServer as "python_grpc/greet_server.py"
+  participant GreetStub as "python_grpc/greet_pb2_grpc.py"
 
-  GreeterClient->>GreeterStub: "invoke SayHello"
-  GreeterStub->>GreeterServer: "gRPC request (uses helloworld_pb2 messages)"
-  GreeterServer-->>GreeterStub: "gRPC response (returns helloworld_pb2 message)"
-  GreeterStub-->>GreeterClient: "response returned to client"
+  GreetClient->>GreetStub: import stub/generate request (greet_pb2_grpc.py)
+  GreetClient->>GreetServer: RPC call (via gRPC transport)
+  GreetServer->>GreetStub: handle request (uses greet_pb2.py)
+  GreetServer-->>GreetClient: RPC response
 
 ```
 
-- Mapping to files: greeter_client.py and greeter_server.py exist (grpc_quickstart/greeter_client.py, grpc_quickstart/greeter_server.py) and generated bindings exist (grpc_quickstart/helloworld_pb2.py, grpc_quickstart/helloworld_pb2_grpc.py).
-
 ## Evidence-Based Risks
-1. Missing declared dependencies: No requirements.txt, pyproject.toml, or similar dependency file at repository root — repository file list does not include such files (file tree). This makes reproducing exact gRPC/protobuf Python package versions unclear.
-2. Committed generated code: Multiple generated files (_pb2.py and _pb2_grpc.py) are committed (examples: grpc_quickstart/helloworld_pb2.py, python_grpc/greet_pb2.py, grpc_kendi/deneme_pb2.py). Presence of generated artifacts can lead to divergence from .proto sources if not regenerated consistently.
-3. Multiple example servers/clients without a single entrypoint: Repository contains many standalone client/server scripts (e.g., grpc_kendi/deneme_server.py, python_grpc/greet_server.py, server_client/OrderService.py) and no top-level orchestrator or README instructions for which to run (README.md exists but dependency files are absent), which may cause confusion about intended production entrypoint or deployment path.
+1. No dependency manifest present (no requirements.txt / pyproject.toml / setup.py) — repository root: missing files for reproducible installs and dependency auditing.
+2. Generated protobuf/grpc Python files are committed (many *_pb2.py and *_pb2_grpc.py across directories, e.g., grpc_kendi/deneme_pb2.py, python_grpc/greet_pb2.py, server_client/order_pb2.py) — increases repo size and can cause drift between .proto and generated code.
+3. Multiple, parallel example implementations with no clear canonical entry point (directories grpc_kendi/, grpc_quickstart/, python_grpc/, server_client/) — risk of duplication and maintenance burden.
+
+## Code Review
+
+### Priority Summary
+| ID | Priority | Category | Technical Debt | Evidence | Impact | Recommended Action |
+|---|---:|---|---|---|---|---|
+| TEC-01 | P2 | Technology | Missing dependency manifest | repository root (no requirements.txt, pyproject.toml, setup.py found) | Reproducibility and dependency-audit gaps | Add requirements.txt or pyproject.toml and pin key dependencies; document install steps |
+| TEC-02 | P2 | Technology | Committed generated protobuf/grpc Python files | grpc_kendi/deneme_pb2.py, grpc_kendi/deneme_pb2_grpc.py, python_grpc/greet_pb2.py, python_grpc/greet_pb2_grpc.py, server_client/order_pb2.py, server_client/order_pb2_grpc.py, etc. | Larger repo, potential drift between .proto and generated artifacts | Remove generated *_pb2.py and *_pb2_grpc.py from VCS or add clear generation script; add .gitignore and generation instructions |
+| ARC-03 | P2 | Architecture | Multiple duplicated example implementations and no canonical entry point | directories: grpc_kendi/, grpc_quickstart/, python_grpc/, server_client/ with server/client duplicates (e.g., greet_server.py, greeter_server.py, deneme_server.py) | Maintenance overhead, unclear primary example for users | Consolidate examples or add a top-level README to identify canonical example; factor shared code into a single package |
+| STA-04 | P2 | Static Analysis | No automated tests present | repository root (no tests/ directory, no test_*.py files in tree) | Lack of regression protection and CI readiness | Add unit and integration tests (e.g., tests for server handlers and client stubs) and document how to run them |
+| STA-05 | P3 | Static Analysis | Inconsistent file naming and example layout across directories | file names: grpc_kendi/yusuf_server.py, grpc_kendi/last_server.py vs grpc_quickstart/greeter_server.py vs python_grpc/greet_server.py | Minor developer confusion and harder discoverability | Standardize naming conventions and example layout; add an index README listing examples |
+
+### Static Analysis
+- P2 STA-04: No automated tests detected (no tests/ directory or test_*.py files) — evidence: full file tree contains example scripts only (e.g., python_grpc/greet_server.py, grpc_quickstart/greeter_server.py).
+- P3 STA-05: Inconsistent naming/layout across example directories (grpc_kendi/yusuf_server.py, grpc_quickstart/greeter_server.py, python_grpc/greet_server.py) — evidence: file list shows varying conventions and duplicate example purposes.
+
+### Security
+- No evidence-backed technical debt found
+
+### Architecture
+- P2 ARC-03: Multiple parallel example implementations (grpc_kendi/, grpc_quickstart/, python_grpc/, server_client/) without a single canonical entry or shared library — evidence: directories and duplicate server/client files (e.g., grpc_kendi/deneme_server.py, python_grpc/greet_server.py, grpc_quickstart/greeter_server.py). Recommend consolidation and a clear README indicating recommended example.
+
+### Technology
+- P2 TEC-01: Missing dependency manifest — evidence: repository root listing contains README.md but no requirements.txt, pyproject.toml, or setup.py. Action: add dependency manifest and installation instructions.
+- P2 TEC-02: Committed generated protobuf/grpc Python modules across multiple directories (e.g., grpc_kendi/deneme_pb2.py, python_grpc/greet_pb2.py, server_client/order_pb2.py) — evidence: generated *_pb2.py and *_pb2_grpc.py files present. Action: remove generated artifacts from VCS or centralize their generation with a build script and document the process.
 
 ---
 
