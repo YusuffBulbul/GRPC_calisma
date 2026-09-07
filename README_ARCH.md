@@ -7,56 +7,58 @@
 # English Version
 
 ## Project Purpose
-The project serves as a comprehensive study and implementation repository for gRPC (Remote Procedure Call) using Python. It demonstrates service definitions through Protocol Buffers (`.proto`) and provides corresponding client-server communication examples across multiple domains like greeting services and order/payment processing.
+This project serves as a comprehensive study and implementation repository for gRPC (Google Remote Procedure Call) using Python. It demonstrates various communication patterns, service definitions via `.proto` files, and the interaction between multiple microservice-like components such as `OrderService` and `PaymentService`.
 
 ## Technical Stack
 - **Language**: Python
-- **Framework**: gRPC (inferred from `_pb2_grpc.py` files)
-- **Key Dependencies**: `protobuf` (based on `.proto` files), `grpcio` (inferred from `server_client/OrderService.py` and similar server files)
+- **Framework**: gRPC
+- **Key Dependencies**: `grpcio`, `protobuf` (inferred from `_pb2.py` and `_pb2_grpc.py` generated files)
+- **Data Serialization**: Protocol Buffers (Proto3)
 
 ## Architecture Blueprint
 
 ```mermaid
 flowchart TD
-    subgraph Protobuf ["Data Contracts (.proto)"]
+    subgraph ClientLayer ["Client Layer"]
+        C1["deneme_client.py"]
+        C2["yusuf_client.py"]
+        C3["greeter_client.py"]
+        C4["OrderService.py"]
+    end
+
+    subgraph ProtoDefinitions ["Interface Definitions (.proto)"]
         P1["deneme.proto"]
         P2["helloworld.proto"]
         P3["order.proto"]
         P4["payment.proto"]
     end
 
-    subgraph Generated ["Generated Python Code"]
+    subgraph GeneratedCode ["gRPC Stubs & Messages"]
         G1["deneme_pb2_grpc.py"]
-        G2["order_pb2_grpc.py"]
+        G2["order_pb2.py"]
         G3["payment_pb2_grpc.py"]
     end
 
-    subgraph Implementation ["Service Logic"]
-        S1["OrderService.py"]
-        S2["PaymentService.py"]
+    subgraph ServerLayer ["Server Layer"]
+        S1["deneme_server.py"]
+        S2["yusuf_server.py"]
         S3["greeter_server.py"]
-        S4["deneme_server.py"]
+        S4["PaymentService.py"]
     end
 
-    subgraph Clients ["Consumer Clients"]
-        C1["greeter_client.py"]
-        C2["deneme_client.py"]
-        C3["yusuf_client.py"]
-    end
+    C1 --> G1
+    C4 --> G2
+    C4 --> G3
+    G1 --> S1
+    G3 --> S4
+    P1 -.->|compiled to| G1
+    P3 -.->|compiled to| G2
+    P4 -.->|compiled to| G3
 
-    P1 -.-> G1
-    P3 -.-> G2
-    P4 -.-> G3
-    G1 --> S4
-    G2 --> S1
-    G3 --> S2
-    S4 <--> C2
-    S3 <--> C1
-
-    style Protobuf fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style Generated fill:#8b949e,stroke:#c9d1d9,color:#fff
-    style Implementation fill:#238636,stroke:#3fb950,color:#fff
-    style Clients fill:#1f6feb,stroke:#58a6ff,color:#fff
+    style ClientLayer fill:#1f6feb,stroke:#58a6ff,color:#fff
+    style ServerLayer fill:#238636,stroke:#3fb950,color:#fff
+    style ProtoDefinitions fill:#8b949e,stroke:#c9d1d9,color:#fff
+    style GeneratedCode fill:#8b949e,stroke:#c9d1d9,color:#fff
 
 ```
 
@@ -64,24 +66,23 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    participant C as Client (e.g., greet_client.py)
-    participant S as gRPC Stub (Generated)
-    participant SRV as Server (e.g., greet_server.py)
+    participant Client as OrderService.py
+    participant Stub as payment_pb2_grpc
+    participant Server as PaymentService.py
 
-    C->>S: Call RPC Method (Message Object)
-    S->>S: Serialize to Protobuf Binary
-    S->>SRV: Send HTTP/2 Stream Request
-    SRV->>SRV: Execute Service Logic (Order/Greet)
-    SRV->>S: Send Binary Response
-    S->>S: Deserialize to Python Object
-    S->>C: Return Response
+    Client->>Stub: Initialize insecure_channel(target)
+    Client->>Stub: Invoke RPC Method (e.g., Pay)
+    Stub->>Server: Encapsulated Protobuf Request
+    Note over Server: Execute business logic
+    Server-->>Stub: Protobuf Response
+    Stub-->>Client: Python Object Response
 
 ```
 
 ## Evidence-Based Risks
-1. **Tight Coupling to Generated Code**: The presence of generated files like `deneme_pb2.py` and `order_pb2.py` directly in the repository (instead of generating them at build time) risks version mismatch if the `.proto` files are updated without regenerating the Python code.
-2. **Hardcoded Connection Endpoints**: Multiple client files (e.g., `yusuf_client.py`, `last_client.py`) imply static address binding, which limits scalability and environment-specific configuration (Dev/Prod).
-3. **Lack of Dependency Specification**: There is no `requirements.txt` or `pyproject.toml` file in the tree, making environment replication and version control of the `grpcio` library difficult for external developers.
+1. **Lack of Dependency Management**: There is no `requirements.txt`, `pipfile`, or `pyproject.toml` in the repository, making environment replication difficult for external users.
+2. **Generated Code Persistence**: Multiple generated files (e.g., `deneme_pb2.py`, `last_dance_pb2_grpc.py`) are committed directly to the repository. This can lead to version mismatch risks between the `.proto` source and the actual logic if not synchronized by a build script.
+3. **Hardcoded Configurations**: Service implementations (e.g., `deneme_server.py`, `yusuf_server.py`) lack externalized configuration (like `.env` or `config.yaml`), suggesting that port numbers and hostnames are likely hardcoded within the source.
 
 ---
 
