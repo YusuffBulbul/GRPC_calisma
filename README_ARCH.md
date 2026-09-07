@@ -7,62 +7,48 @@
 # English Version
 
 ## Project Purpose
-This project serves as a comprehensive study and implementation laboratory for gRPC (Google Remote Procedure Call) using Python. It demonstrates unary and potentially streaming communication patterns through various service implementations including greeting systems, order management, and payment processing.
+This repository is a comprehensive study and collection of gRPC (Remote Procedure Call) implementations in Python. It demonstrates service definition using Protocol Buffers and the corresponding client-server communication patterns across multiple experimental modules including order management and greeting services.
 
 ## Technical Stack
 - **Language**: Python
 - **Framework**: gRPC
-- **Key Dependencies**: `grpcio`, `protobuf` (Inferred from `_pb2.py` and `_pb2_grpc.py` files)
+- **Key Dependencies**: `grpcio`, `grpcio-tools`, `protobuf` (inferred from `*_pb2.py` and `*_pb2_grpc.py` artifacts).
 
 ## Architecture Blueprint
 
 ```mermaid
 flowchart TD
-    subgraph Protobuf ["Interface Definitions (.proto)"]
+    subgraph ClientLayer ["Client Layer"]
+        C1["deneme_client.py"]
+        C2["greeter_client.py"]
+        C3["yusuf_client.py"]
+        C4["greet_client.py"]
+    end
+
+    subgraph InterfaceLayer ["Interface Definition (Protobuf)"]
         P1["deneme.proto"]
         P2["helloworld.proto"]
         P3["order.proto"]
         P4["payment.proto"]
     end
 
-    subgraph Generated ["gRPC Stubs & Messages"]
-        G1["deneme_pb2_grpc.py"]
-        G2["helloworld_pb2_grpc.py"]
-        G3["order_pb2_grpc.py"]
-        G4["payment_pb2_grpc.py"]
-    end
-
-    subgraph Logic ["Service Implementations"]
+    subgraph ServerLayer ["Server Layer"]
         S1["deneme_server.py"]
         S2["greeter_server.py"]
         S3["OrderService.py"]
         S4["PaymentService.py"]
     end
 
-    subgraph Clients ["Client Applications"]
-        C1["deneme_client.py"]
-        C2["greeter_client.py"]
-        C3["greet_client.py"]
-    end
-
-    P1 -.-> G1
-    P2 -.-> G2
-    P3 -.-> G3
-    P4 -.-> G4
-
-    G1 --> S1
-    G2 --> S2
-    G3 --> S3
-    G4 --> S4
-
-    C1 --> G1
-    C2 --> G2
-    C3 --> G2
-
-    style Protobuf fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style Generated fill:#8b949e,stroke:#c9d1d9,color:#fff
-    style Logic fill:#238636,stroke:#3fb950,color:#fff
-    style Clients fill:#1f6feb,stroke:#58a6ff,color:#fff
+    C1 -->|"gRPC/HTTP2"| S1
+    C2 -->|"gRPC/HTTP2"| S2
+    P1 -.->|"generates"| C1
+    P1 -.->|"generates"| S1
+    C3 -->|"gRPC/HTTP2"| S3
+    style C1 fill:#1f6feb,stroke:#58a6ff,color:#fff
+    style C2 fill:#1f6feb,stroke:#58a6ff,color:#fff
+    style S1 fill:#238636,stroke:#3fb950,color:#fff
+    style S2 fill:#238636,stroke:#3fb950,color:#fff
+    style P1 fill:#8b949e,stroke:#c9d1d9,color:#fff
 
 ```
 
@@ -70,23 +56,22 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client Application (e.g., yusuf_client.py)
-    participant Stub as gRPC Generated Stub
-    participant Server as gRPC Server (e.g., yusuf_server.py)
+    participant C as greeter_client.py
+    participant G as helloworld_pb2_grpc
+    participant S as greeter_server.py
 
-    Note over Client, Server: Connection initialized on localhost:50051
-    Client->>Stub: Call RPC Method (Request Object)
-    Stub->>Server: Serialize & Send Proto Request
-    Server->>Server: Execute Business Logic
-    Server->>Stub: Return Proto Response
-    Stub->>Client: Deserialize & Return Result
+    C->>G: Invoke RPC Method (e.g., SayHello)
+    G->>S: Transmit Serialized Protobuf Data
+    Note over S: Execute Business Logic
+    S->>G: Return Response Object
+    G->>C: Deserialize and Deliver Result
 
 ```
 
 ## Evidence-Based Risks
-1. **Hardcoded Configurations**: Service endpoints (e.g., `localhost:50051`) are hardcoded directly within `client.py` and `server.py` files across all subdirectories, hindering environment portability.
-2. **Lack of Encryption**: No evidence of `grpc.ssl_channel_credentials()` usage in client files or secure port binding in server files, indicating the use of insecure channels.
-3. **Redundant Codebase**: Multiple directories (`grpc_kendi`, `python_grpc`, `grpc_quickstart`) contain overlapping logic and duplicate `.proto` definitions, increasing maintenance overhead and risk of version mismatch.
+1. **Lack of Encryption**: The project structure follows standard gRPC tutorial patterns (e.g., `grpc_quickstart/`), which typically utilize `insecure_channel()`. There is no evidence of SSL/TLS certificates (.crt, .key) in the repository to secure communication.
+2. **Code Redundancy**: The repository contains multiple nearly-identical implementations of greeting services (e.g., `grpc_kendi/`, `grpc_quickstart/`, `python_grpc/`), indicating fragmented development and high maintenance overhead.
+3. **Tight Coupling**: Protobuf generated files (`*_pb2.py`) are stored alongside source code in multiple subdirectories without a centralized package management strategy, risking version mismatch between clients and servers during updates.
 
 ---
 
